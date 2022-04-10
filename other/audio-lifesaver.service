@@ -1,0 +1,9 @@
+[Unit]
+Description=Audio lifesaver
+
+[Service]
+ExecStart=PATH TO BINARY
+Restart=always
+
+[Install]
+WantedBy=default.target
