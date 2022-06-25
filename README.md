@@ -4,6 +4,9 @@ Mute all audio & pause all mpris-based players when you disconnect your headphon
 Written in Rust with minimal Rust knowledge 😎
 
 ## Installation
+Download the latest release binary [here](https://github.com/itsmexxie/audio-lifesaver/releases/latest) and run it. If you want it to run at startup you can follow the guide(s) here:
+
+### Systemd
 Copy the `other/audio-lifesaver.service` file into either:
 
 ```bash
