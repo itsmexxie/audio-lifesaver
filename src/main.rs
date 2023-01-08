@@ -2,6 +2,7 @@ use std::{ collections::HashMap, io::{ BufRead, BufReader }, process::{ Stdio, C
 use log::{ debug };
 use regex::Regex;
 use mpris::{ PlayerFinder, PlaybackStatus };
+use notify_rust::Notification;
 
 fn parse_event(test_string: &str, target_string: &str) -> Option<String> {
 	let re = Regex::new(test_string).ok()?;
@@ -10,8 +11,8 @@ fn parse_event(test_string: &str, target_string: &str) -> Option<String> {
 }
 
 fn exec_cmds(cmds_vec: Vec<(&str, &[&str])>) {
-	for cmd_vec in cmds_vec {
-		let (cmd, args) = cmd_vec;
+	for cmd_tuple in cmds_vec {
+		let (cmd, args) = cmd_tuple;
 		Command::new(cmd)
 			.args(args)
 			.status()
@@ -30,7 +31,7 @@ fn respond_to_event(event_type: &str, player_status: &mut HashMap<String, i32>) 
 	match event_type {
 		"plug" => {
 			// Unmute everything
-			exec_cmds(vec![("amixer", &["-q", "set", "Master", "unmute"]), ("amixer", &["-q", "set", "Speaker", "unmute"]), ("amixer", &["-q", "set", "Headphone", "unmute"])]);
+			exec_cmds(vec![("amixer", &["-q", "set", "Master", "unmute"])]);
 			debug!("Unmuting...");
 
 			// Loop through players and play the ones that were playing before
@@ -47,6 +48,13 @@ fn respond_to_event(event_type: &str, player_status: &mut HashMap<String, i32>) 
 					}
 				}
 			}
+
+			// Show notification
+			Notification::new()
+				.summary("Audio Lifesaver")
+				.body("Unmuting system audio...")
+				.show()
+				.unwrap();
 		}
 		"unplug" => {
 			// Mute master, which also mutes everything else
@@ -64,6 +72,13 @@ fn respond_to_event(event_type: &str, player_status: &mut HashMap<String, i32>) 
 				player.pause().unwrap();
 				debug!("Pausing player {}...", player.bus_name());
 			}
+
+			// Show notification
+			Notification::new()
+				.summary("Audio Lifesaver")
+				.body("Muting system audio...")
+				.show()
+				.unwrap();
 		}
 		_ => {}
 	}
